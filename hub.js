@@ -1,22 +1,8 @@
 import { games } from './games.js';
+import { banner, items } from './site-content.js';
 
 const categories=[
 {id:'all',label:'All items',icon:'fa-border-all'},{id:'games',label:'Arcade',icon:'fa-gamepad'},{id:'media',label:'Cinema & audio',icon:'fa-film'},{id:'tools',label:'Utilities',icon:'fa-wrench'},{id:'social',label:'Community',icon:'fa-users'}
-];
-const items=[
-{title:'Games Portal',desc:'Classic web arcade games collection',icon:'fa-gamepad',color:'#00f7ff',category:'games',badge:'Popular',page:'games'},
-{title:'Top Popular',desc:'Most played community favorites',icon:'fa-fire-flame-curved',color:'#ff6c75',category:'games',badge:'Trending',page:'popular',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/popular-gameseeewf'},
-{title:'Online Arena',desc:'Multiplayer games with friends',icon:'fa-vr-cardboard',color:'#ffab40',category:'games',page:'online-arena',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/online-games'},
-{title:'Movie Section',desc:'Stream movies and shows together',icon:'fa-clapperboard',color:'#ff5c9a',category:'media',page:'movie-section',maintenance:true,url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/movie-section'},
-{title:'Soundboard',desc:'Sound effects, clips & sound bytes',icon:'fa-sliders',color:'#e080fa',category:'media',page:'soundboard',maintenance:true,url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/soundboard'},
-{title:'Secure Proxy',desc:'Unfiltered web browsing portal',icon:'fa-shield-halved',color:'#69f0ae',category:'tools',page:'secure-proxy',maintenance:true,url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/proxies'},
-{title:'Newsletter',desc:'Dev news, updates & site releases',icon:'fa-newspaper',color:'#64ffda',category:'tools',page:'newsletter',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/news-4-9'},
-{title:'Support Center',desc:'Report issues, bugs & game requests',icon:'fa-headset',color:'#69a7ff',category:'social',page:'support-center',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/supportreport'},
-{title:'Community Chat',desc:'Hang out and chat live with peers',icon:'fa-comments',color:'#18ffff',category:'social',page:'community-chat',maintenance:true,url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/chat'},
-{title:'Rate Us',desc:'Submit site reviews and ratings',icon:'fa-star',color:'#ffd166',category:'social',page:'rate-us',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/rate-us'},
-{title:'Credits',desc:'Special thanks to creators & staff',icon:'fa-code-branch',color:'#ff8a65',category:'social',page:'credits',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/credits'},
-{title:'Shopping Links',desc:'Deals, merch & online shop directory',icon:'fa-bag-shopping',color:'#ff6c75',category:'tools',page:'shopping-links',maintenance:true,url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/shopping-links'},
-{title:'Miscellaneous',desc:'Random apps, easter eggs & extras',icon:'fa-cubes',color:'#a7ffeb',category:'tools',page:'miscellaneous',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/miscellaneous'}
 ];
 const popularGames=[
 {name:'Kour.io',image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6CvPv2uN0cM1OuBsgLJwTBVJvUexCap3M2FHoqj1V4a2W3YJYCULeqWY&s',url:'https://sites.google.com/4j.lane.edu/gashergamesedu-17/kour-io'},
@@ -29,6 +15,15 @@ const categoryHost=document.querySelector('#categories');
 const grid=document.querySelector('#card-grid');
 const queryInput=document.querySelector('#search');
 let activeCategory='all';
+function applyBanner(){
+ document.querySelector('#banner-label').textContent=banner.label;
+ document.querySelector('#banner-headline').textContent=banner.headline;
+ document.querySelector('#banner-highlight').textContent=banner.highlight;
+ document.querySelector('#banner-description').textContent=banner.description;
+ const action=document.querySelector('#banner-action');
+ action.href=banner.buttonLink;
+ action.querySelector('span').textContent=banner.buttonText;
+}
 function renderCategories(){categoryHost.innerHTML=categories.map(c=>'<button class="dock-btn'+(activeCategory===c.id?' active':'')+'" data-category="'+c.id+'"><i class="fa-solid '+c.icon+'"></i>'+c.label+'</button>').join('')}
 function renderHome(){
  const q=queryInput.value.trim().toLowerCase();
@@ -43,13 +38,15 @@ let activeTab='all';
 function renderTabs(){const tabs=[{id:'all',label:'All games'},{id:'featured',label:'Featured'}];document.querySelector('#game-tabs').innerHTML=tabs.map(t=>'<button class="tab-btn'+(activeTab===t.id?' active':'')+'" role="tab" aria-selected="'+(activeTab===t.id)+'" data-tab="'+t.id+'">'+t.label+'</button>').join('')}
 function renderGames(){
  const q=document.querySelector('#game-search').value.trim().toLowerCase();
- const shown=games.filter(game=>(activeTab==='all'||game.featured||game.title==='Gasher Game Jam'||game.title==='Silksong')&&(!q||game.title.toLowerCase().includes(q)));
+ const shown=games.filter(game=>(activeTab==='all'||game.featured)&&(!q||game.title.toLowerCase().includes(q)));
  document.querySelector('#game-count').textContent=shown.length+' TITLES';
  document.querySelector('#game-grid').innerHTML=shown.map(game=>{
-  const fallback='<div class="game-fallback" style="--accent:'+game.color+'">'+(game.featured?'<span class="featured-symbol">↗</span>':'<i class="fa-solid '+game.icon+'"></i>')+'</div>';
+  const accent=game.color||'#d8ef70';
+  const icon=game.icon||'fa-gamepad';
+  const fallback='<div class="game-fallback" style="--accent:'+accent+'">'+(game.featured?'<span class="featured-symbol">↗</span>':'<i class="fa-solid '+icon+'"></i>')+'</div>';
   const image=game.image?'<img class="game-img" src="'+game.image+'" alt="" loading="lazy">':'';
   const external=/^https?:\/\//i.test(game.url);
-  return '<a class="game-btn'+(game.featured?' featured-tile':'')+'" href="'+game.url+'"'+(external?' target="_blank" rel="noopener noreferrer"':'')+' style="--accent:'+game.color+'">'+fallback+image+'<span class="tile-mark"><i class="fa-solid '+(external?'fa-arrow-up-right-from-square':'fa-play')+'"></i></span><span class="game-name">'+game.title+'</span></a>'
+  return '<a class="game-btn'+(game.featured?' featured-tile':'')+'" href="'+game.url+'"'+(external?' target="_blank" rel="noopener noreferrer"':'')+' style="--accent:'+accent+'">'+fallback+image+'<span class="tile-mark"><i class="fa-solid '+(external?'fa-arrow-up-right-from-square':'fa-play')+'"></i></span><span class="game-name">'+game.title+'</span></a>'
  }).join('');
  document.querySelectorAll('.game-img').forEach(img=>img.addEventListener('error',()=>img.remove()));
  document.querySelector('#game-empty').hidden=shown.length>0;
@@ -78,12 +75,13 @@ function renderPopular(){
  board.innerHTML=popularGames.map((game,index)=>'<a class="leaderboard-row'+([' first',' second',' third'][index]||'')+'" href="'+game.url+'" target="_blank" rel="noopener noreferrer"><span class="rank">'+(index+1)+'</span><img class="thumb" src="'+game.image+'" alt="" loading="lazy"><span class="popular-name">'+game.name+'</span><i class="fa-solid fa-arrow-up-right-from-square row-arrow" aria-hidden="true"></i></a>').join('');
 }
 function syncRoute(){
- const route=location.hash.slice(1);const isGames=route==='games';const isHome=!isGames&&!items.some(item=>item.page===route);
+ const route=location.hash.slice(1);const isGames=route==='games';const isSettings=route==='settings';const isHome=!isGames&&!isSettings&&!items.some(item=>item.page===route);
  document.querySelector('#home-view').hidden=!isHome;
  document.querySelector('#games-view').hidden=!isGames;
- document.querySelector('#detail-view').hidden=isHome||isGames;
+ document.querySelector('#settings-view').hidden=!isSettings;
+ document.querySelector('#detail-view').hidden=isHome||isGames||isSettings;
  if(isGames){renderGames();window.scrollTo(0,0)}
- else if(!isHome){renderDetail(route);window.scrollTo(0,0)}
+ else if(!isHome&&!isSettings){renderDetail(route);window.scrollTo(0,0)}
 }
 categoryHost.addEventListener('click',e=>{const button=e.target.closest('[data-category]');if(!button)return;activeCategory=button.dataset.category;renderCategories();renderHome()});
 document.querySelector('#game-tabs').addEventListener('click',e=>{const button=e.target.closest('[data-tab]');if(!button)return;activeTab=button.dataset.tab;renderTabs();renderGames()});
@@ -92,4 +90,10 @@ document.querySelector('#game-search').addEventListener('input',renderGames);
 document.addEventListener('input',e=>{if(e.target.id==='popular-search')renderPopular()});
 window.addEventListener('hashchange',syncRoute);
 window.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&location.hash!=='#games'){e.preventDefault();queryInput.focus()}if(e.key==='Escape'&&location.hash==='#games')location.hash='#home'});
-renderCategories();renderHome();renderTabs();syncRoute();
+applyBanner();renderCategories();renderHome();renderTabs();syncRoute();
+
+const savedTheme=localStorage.getItem('gasher-theme')||'dark';
+document.body.classList.toggle('light-theme',savedTheme==='light');
+function setTheme(theme){document.body.classList.toggle('light-theme',theme==='light');localStorage.setItem('gasher-theme',theme);document.querySelectorAll('.theme-option').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.theme===theme)));}
+document.querySelector('#settings-view').addEventListener('click',event=>{const button=event.target.closest('[data-theme]');if(button)setTheme(button.dataset.theme)});
+setTheme(savedTheme);
